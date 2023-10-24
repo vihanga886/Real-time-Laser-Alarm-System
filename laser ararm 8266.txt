@@ -1,0 +1,50 @@
+#define BLYNK_TEMPLATE_ID "xxxxxxxxxxxxxx"
+#define BLYNK_TEMPLATE_NAME "xxxxxxxxxxxxxxxxxx"
+#define BLYNK_AUTH_TOKEN "xxxxxxxxxxxxxxx"
+
+#define BLYNK_PRINT Serial
+#include <ESP8266WiFi.h>
+#include <BlynkSimpleEsp8266.h>
+ 
+char auth[] = BLYNK_AUTH_TOKEN;
+
+char ssid[] = "username";  
+char pass[] = "password";  
+ 
+#define LASER_ALARM 4
+
+BlynkTimer timer;
+
+void TheftAlert(){
+  int isTheftAlert = digitalRead(LASER_ALARM);
+  Serial.println(isTheftAlert);
+  if (isTheftAlert==1) {
+    Serial.println("Theft Alert there");
+    //Blynk.email("xxxxxxxxxxxxxx@gmail.com", "Alert", "Theft Alert in Home");
+    Blynk.logEvent("xxxxxxxxxxx","Hi Vihanga, Theft Alert there !!!");
+    digitalWrite(13, HIGH);
+    digitalWrite(15, HIGH);  
+    //Blynk.logEvent("laser_alarm","Theft Alert in Home");
+  }
+  else if (isTheftAlert==0){
+   digitalWrite(13, LOW);
+   digitalWrite(15, LOW); 
+  }
+}
+
+void setup(){
+  pinMode(LASER_ALARM, INPUT);
+  pinMode(13, OUTPUT);
+  pinMode(15, OUTPUT);
+
+  Serial.begin(115200);
+
+  Blynk.begin(auth, ssid, pass);
+  pinMode(D1, INPUT_PULLUP);
+  timer.setInterval(500L, TheftAlert);
+}
+
+void loop(){
+  Blynk.run();
+  timer.run();
+}
